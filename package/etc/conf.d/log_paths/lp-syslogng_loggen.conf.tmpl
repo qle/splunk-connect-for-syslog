@@ -45,19 +45,19 @@ log {
 {{- /* destination. When more destination options are offered in SC4S, this is where */}}
 {{- /* output to them will be configured */}}
 
-{{- if (print (getenv "SC4S_DEST_SYSLOGNG_LOGGEN_ALT_FILTER")) }}
+{{- if (print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER")) }}
 
 # HEC destination is *not* included by default for filtered destinations
 
-    if (filter({{ print (getenv "SC4S_DEST_SYSLOGNG_LOGGEN_ALT_FILTER") }})) {
-{{- if (print (getenv "SC4S_DEST_SYSLOGNG_LOGGEN_FILTERED_ALTERNATES")) }}
-        {{ getenv "SC4S_DEST_SYSLOGNG_LOGGEN_FILTERED_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n        destination(" }});
+    if (filter({{ print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER") }})) {
+{{- if (print (getenv "SC4S_DEST" $context.port_id "FILTERED_ALTERNATES")) }}
+        {{ getenv "SC4S_DEST" $context.port_id "FILTERED_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n        destination(" }});
 {{- end }}
     }
     else {
 {{- end }}
 
-{{- if or (conv.ToBool (getenv "SC4S_DEST_SPLUNK_HEC_GLOBAL" "yes")) (conv.ToBool (getenv "SC4S_DEST_SYSLOGNG_LOGGEN_HEC" "no")) }}
+{{- if or (conv.ToBool (getenv "SC4S_DEST_SPLUNK_HEC_GLOBAL" "yes")) (conv.ToBool (getenv "SC4S_DEST" $context.port_id "HEC" "no")) }}
     destination(d_hec);
 {{- end}}
 
@@ -69,11 +69,11 @@ log {
     {{ getenv "SC4S_DEST_GLOBAL_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n    destination(" }});
 {{- end }}
 
-{{- if (print (getenv "SC4S_DEST_SYSLOGNG_LOGGEN_ALTERNATES")) }}
-    {{ getenv "SC4S_DEST_SYSLOGNG_LOGGEN_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n    destination(" }});
+{{- if (print (getenv "SC4S_DEST" $context.port_id "ALTERNATES")) }}
+    {{ getenv "SC4S_DEST" $context.port_id "ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n    destination(" }});
 {{- end }}
 
-{{- if (print (getenv "SC4S_DEST_SYSLOGNG_LOGGEN_ALT_FILTER")) }}
+{{- if (print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER")) }}
     };
 {{- end }}
 

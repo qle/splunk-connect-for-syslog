@@ -10,7 +10,7 @@ filter f_symantec_brightmail_details {
     program("bmserver") and not message('\[Brightmail\]')
 };
 
-{{- if (conv.ToBool (getenv "SC4S_SOURCE_FF_SYMANTEC_BRIGHTMAIL_GROUPMSG" "yes")) }}
+{{- if (conv.ToBool (getenv "SC4S_SOURCE_FF" $context.port_id "GROUPMSG" "yes")) }}
 filter f_symantec_brightmail_complete{
     match("yes", value("SMG.COMPLETE") type(glob));
 };
@@ -51,7 +51,7 @@ log {
         };
     };
 
-{{- if (conv.ToBool (getenv "SC4S_SOURCE_FF_SYMANTEC_BRIGHTMAIL_GROUPMSG" "yes")) }}
+{{- if (conv.ToBool (getenv "SC4S_SOURCE_FF" $context.port_id "GROUPMSG" "yes")) }}
     if {
 
         filter(f_symantec_brightmail_details);
@@ -68,19 +68,19 @@ log {
             parser (compliance_meta_by_source);
             rewrite { set("$(template ${.splunk.sc4s_template} $(template t_legacy_hdr_msg))" value("MSG")); };
 
-            {{- if (print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_ALT_FILTER")) }}
+            {{- if (print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER")) }}
 
 # HEC destination is *not* included by default for filtered destinations
 
-            if (filter({{ print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_ALT_FILTER") }})) {
-            {{- if (print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_FILTERED_ALTERNATES")) }}
-                {{ getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_FILTERED_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n                destination(" }});
+            if (filter({{ print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER") }})) {
+            {{- if (print (getenv "SC4S_DEST" $context.port_id "FILTERED_ALTERNATES")) }}
+                {{ getenv "SC4S_DEST" $context.port_id "FILTERED_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n                destination(" }});
             {{- end }}
             }
             else {
             {{- end }}
 
-            {{- if or (conv.ToBool (getenv "SC4S_DEST_SPLUNK_HEC_GLOBAL" "yes")) (conv.ToBool (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_HEC" "no")) }}
+            {{- if or (conv.ToBool (getenv "SC4S_DEST_SPLUNK_HEC_GLOBAL" "yes")) (conv.ToBool (getenv "SC4S_DEST" $context.port_id "HEC" "no")) }}
             destination(d_hec);
             {{- end}}
 
@@ -88,7 +88,7 @@ log {
             destination(d_archive);
             {{- end}}
 
-            {{- if (print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_ALT_FILTER")) }}
+            {{- if (print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER")) }}
             };
             {{- end }}
         };
@@ -103,19 +103,19 @@ log {
         parser (compliance_meta_by_source);
         rewrite { set("$(template ${.splunk.sc4s_template} $(template t_legacy_hdr_msg))" value("MSG")); };
 
-        {{- if (print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_ALT_FILTER")) }}
+        {{- if (print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER")) }}
 
 # HEC destination is *not* included by default for filtered destinations
 
-        if (filter({{ print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_ALT_FILTER") }})) {
-        {{- if (print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_FILTERED_ALTERNATES")) }}
-            {{ getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_FILTERED_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n            destination(" }});
+        if (filter({{ print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER") }})) {
+        {{- if (print (getenv "SC4S_DEST" $context.port_id "FILTERED_ALTERNATES")) }}
+            {{ getenv "SC4S_DEST" $context.port_id "FILTERED_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n            destination(" }});
         {{- end }}
         }
         else {
         {{- end }}
 
-{{- if or (conv.ToBool (getenv "SC4S_DEST_SPLUNK_HEC_GLOBAL" "yes")) (conv.ToBool (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_HEC" "no")) }}
+{{- if or (conv.ToBool (getenv "SC4S_DEST_SPLUNK_HEC_GLOBAL" "yes")) (conv.ToBool (getenv "SC4S_DEST" $context.port_id "HEC" "no")) }}
         destination(d_hec);
 {{- end}}
 
@@ -123,10 +123,10 @@ log {
         destination(d_archive);
 {{- end}}
 
-{{- if (print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_ALT_FILTER")) }}
+{{- if (print (getenv "SC4S_DEST" $context.port_id "ALT_FILTER")) }}
         };
 {{- end }}
-{{- if (conv.ToBool (getenv "SC4S_SOURCE_FF_SYMANTEC_BRIGHTMAIL_GROUPMSG" "yes")) }}
+{{- if (conv.ToBool (getenv "SC4S_SOURCE_FF" $context.port_id "GROUPMSG" "yes")) }}
     };
 {{- end}}
 
@@ -134,8 +134,8 @@ log {
     {{ getenv "SC4S_DEST_GLOBAL_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n    destination(" }});
 {{- end }}
 
-{{- if (print (getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_ALTERNATES")) }}
-    {{ getenv "SC4S_DEST_SYMANTEC_BRIGHTMAIL_ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n    destination(" }});
+{{- if (print (getenv "SC4S_DEST" $context.port_id "ALTERNATES")) }}
+    {{ getenv "SC4S_DEST" $context.port_id "ALTERNATES" | regexp.ReplaceLiteral "^" "destination(" | regexp.ReplaceLiteral "[, ]+" ");\n    destination(" }});
 {{- end }}
 
     flags(flow-control,final);
