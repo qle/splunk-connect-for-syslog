@@ -2,7 +2,7 @@
 
 filter f_mcafee_web_gateway {
     program("mwg")
-    or "${fields.sc4s_vendor_product}" eq "mcafeewg"
+    or match("mcafeewg", value("fields.sc4s_vendor_product") type(glob))
 };
 {{- /* The following provides a unique port source configuration if env var(s) are set */}}
 {{- $context := dict "port_id" "Mcafee_WG" "parser" "rfc5424_noversion" }}

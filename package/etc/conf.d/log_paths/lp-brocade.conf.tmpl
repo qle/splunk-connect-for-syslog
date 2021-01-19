@@ -4,7 +4,7 @@
 {{- tmpl.Exec "t/source_network.t" $context }}
 
 filter f_brocade {
-    "${fields.sc4s_vendor_product}" eq "brocade_syslog"
+    match("^brocade_syslog", value("fields.sc4s_vendor_product"));
 };
 
 log {
